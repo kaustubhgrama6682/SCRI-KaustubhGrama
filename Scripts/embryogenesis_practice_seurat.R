@@ -4,34 +4,23 @@ library(Seurat)
 library(patchwork)
 library(monocle3)
 library(garnett)
-
-
-#install bioconductor
-if (!requireNamespace("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
-BiocManager::install(version = "3.18")
-
-BiocManager::install(c("GenomicFeatures", "AnnotationDbi"))
-
-BiocManager::install(c('BiocGenerics', 'DelayedArray', 'DelayedMatrixStats',
-                       'limma', 'lme4', 'S4Vectors', 'SingleCellExperiment',
-                       'SummarizedExperiment', 'batchelor', 'HDF5Array',
-                       'terra', 'ggrastr'))
-
-install.packages("devtools")
-devtools::install_github('cole-trapnell-lab/monocle3')
-devtools::install_github("cole-trapnell-lab/garnett")
+library(SingleR)
+library(celldex)
+library(tidyverse)
+library(pheatmap)
 
 
 
+BiocManager::install("DESeq2")
+BiocManager::install("SingleR")
+BiocManager::install("celldex")
 
-
-basepath <- "/Users/kaustubhgrama/Desktop/Computer Science/R/"
+basepath <- "/Users/kaustubhgrama/Documents/GitHub/SCRI-KaustubhGrama/Scripts"
 
 #load the data
-cts <- ReadMtx(mtx = "/Users/kaustubhgrama/Desktop/Computer Science/R/Small_Data/matrix.mtx.gz",
-               features = "/Users/kaustubhgrama/Desktop/Computer Science/R/Small_Data/features.tsv.gz",
-               cells = "/Users/kaustubhgrama/Desktop/Computer Science/R/Small_Data/barcodes.tsv.gz")
+cts <- ReadMtx(mtx = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/matrix.mtx.gz",
+               features = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/features.tsv.gz",
+               cells = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/barcodes.tsv.gz")
 
 #create seurat object
 org_data <- CreateSeuratObject(count = cts, project = "pmc3k", min.cells = 3, min.features = 200)
@@ -77,6 +66,8 @@ org_data <- FindClusters(org_data, resolution = 1.2)
 #UMAP------------------------------------------------
 org_data <- RunUMAP(org_data, dims = 1:15)
 
+#visualization------------------------------------------
+
 #view PCA clusters at different resolutions
 DimPlot(org_data, reduction = "pca", group.by = "RNA_snn_res.0.2")
 DimPlot(org_data, reduction = "pca", group.by = "RNA_snn_res.0.5")
@@ -87,49 +78,32 @@ DimPlot(org_data, reduction = "umap", group.by = "RNA_snn_res.0.2")
 DimPlot(org_data, reduction = "umap", group.by = "RNA_snn_res.0.5")
 DimPlot(org_data, reduction = "umap", group.by = "RNA_snn_res.1.2")
 
-#save seurat object
-saveRDS(org_data, paste0(basepath, "org_data_seuratobj.RDS"))
-
-#set object identity to chosen resolution
-Idents(org_data) <- "RNA_snn_res.0.2"
-
-#find all markers 
-org_data.markers <- FindAllMarkers(org_data)
-
-#Finding Differentially Expressed Features------------------------------------
-org_data.markers %>% 
-  group_by(cluster) %>% #grouping dataframe by cluster column
-  dplyr::filter(avg_log2FC > 1) %>% #filtering all groups by log2FC > 1
-  slice_head(n = 10) %>% #selecting top 10 genes for each cluster
-  ungroup() -> top10 #restaking each group (aka cluster ) into one variable dataframe
-
-#heatmap of the top 10 upregulated genes per cluster res 0.2
-DoHeatmap(org_data, features = top10$gene) + NoLegend() 
-
-#Gene Ontology Analysis-------------------------------------------------------
-cluster0_features <- top10$gene[1:10]
-cluster1_features <- top10$gene[11:20]
-cluster2_features <- top10$gene[21:30]
-cluster3_features <- top10$gene[31:40]
-cluster4_features <- top10$gene[41:50]
-cluster5_features <- top10$gene[51:60]
-cluster6_features <- top10$gene[61:70]
-cluster7_features <- top10$gene[71:80]
-
-FeaturePlot(org_data, features = cluster0_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster1_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster2_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster3_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster4_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster5_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster6_features, reduction = "umap")
-FeaturePlot(org_data, features = cluster7_features, reduction = "umap")
+#View UMAP by seurat clusters
+seuratClusters.plot <- DimPlot(org_data, reduction = "umap", group.by = "seurat_clusters", label = TRUE)
 
 
-#Create new seurat object with only cluster 0 cells
-org_data.cluster0 <- subset(x = org_data, idents = "0")
+#Find All Markers------------------------------------
+all.markers <- FindAllMarkers(org_data, logfc.threshold = 0.25, min.pct = 0.1, only.pos = TRUE, test.use = 'DESeq2', slot = 'counts')
+
+#SINGLER-----------------------------------------------
+#get reference data-------
+ref <- celldex::HumanPrimaryCellAtlasData()
+View(as.data.frame(colData(ref)))
+
+#run SingleR (default mode)
+#default for SingleR is to perform annotation of each individual cell in the test dataset
+org_data_counts <- GetAssayData(org_data, slot = 'counts')
+main_pred = SingleR(test = org_data_counts, ref = ref, labels = ref$label.main)
+fine_pred = SingleR(test = org_data_counts, ref = ref, labels = ref$label.fine)
+
+
+#insert SingleR annotations into metadata
+org_data$singleR.mainLabels <- main_pred$labels[match(rownames(org_data@meta.data), rownames(main_pred))]
+org_data$singleR.fineLabels <- fine_pred$labels[match(rownames(org_data@meta.data), rownames(fine_pred))]
 
 
 
-
+#View UMAP plot with SingleR annotations
+singleR.mainLables.plot <- DimPlot(org_data, reduction = "umap", group.by = "singleR.mainLabels", label = TRUE)
+singleR.fineLables.plot <- DimPlot(org_data, reduction = "umap", group.by = "singleR.fineLabels", label = TRUE)
 
