@@ -196,6 +196,40 @@ for(cell_type in cell_types){
 }
 
 
-#Subset by cancer type==================
+#Subset by cancer type======================
+
+tumors.seuobj.mb <- subset(tumors.seuobj, subset = orig.ident == "MB")
+tumors.seuobj.atrt <- subset(tumors.seuobj, subset = orig.ident == "atrt40" | orig.ident == "atrt41" | orig.ident == "atrt50" | orig.ident == "atrt61")
+tumors.seuobj.dipg <- subset(tumors.seuobj, subset = orig.ident == "Glioma")
+
+#Violin plots for medulloblastoma
+for(cell_type in cell_types){
+  print(VlnPlot(tumors.seuobj.mb, features = c(cell_type), group.by = "mnn.reconstructed_snn_res.0.8"))
+}
+
+#Violin plots for ATRT
+for(cell_type in cell_types){
+  print(VlnPlot(tumors.seuobj.atrt, features = c(cell_type), group.by = "mnn.reconstructed_snn_res.0.8"))
+}
+
+#Violin plots for DIPG
+for(cell_type in cell_types){
+  print(VlnPlot(tumors.seuobj.dipg, features = c(cell_type), group.by = "mnn.reconstructed_snn_res.0.8"))
+}
+
+
+#DimPlots by cluster
+DimPlot(tumors.seuobj.mb, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
+DimPlot(tumors.seuobj.atrt, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
+DimPlot(tumors.seuobj.dipg, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
+
+
+
+
+
+
+
+
+
 
 
