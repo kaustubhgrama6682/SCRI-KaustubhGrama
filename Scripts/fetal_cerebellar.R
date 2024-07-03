@@ -167,17 +167,35 @@ cluster10.genes <- top10.tumors$gene[101:110]
 cluster11.genes <- top10.tumors$gene[111:120]
 
 
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=purkinje_neuron.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=oligodendrocyte.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=SLC24A4_PEX5L.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=vascular_endothelial.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=astrocyte.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=granule_neuron.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=inhibitory_interneuron.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=unipolar_brush.genes), assay = "RNA")
-tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=microglia.genes), assay = "RNA")
+#Adding Module Scores for each cell type onto tumor cells=============
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=purkinje_neuron.genes), assay = "RNA", name = "purkinje_neuron")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=oligodendrocyte.genes), assay = "RNA", name = "oligodendrocyte")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=SLC24A4_PEX5L.genes), assay = "RNA", name = "SLC24A4_PEX5L")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=vascular_endothelial.genes), assay = "RNA", name = "vascular_endothelial")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=astrocyte.genes), assay = "RNA", name = "astrocyte")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=granule_neuron.genes), assay = "RNA", name = "granule_neuron")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=inhibitory_interneuron.genes), assay = "RNA", name = "inhibitory_interneuron")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=unipolar_brush.genes), assay = "RNA", name = "unipolar_brush")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("celltype"=microglia.genes), assay = "RNA", name = "microglia")
 
 
+##visualization of module scores
+#Dot Plot
+DotPlot(tumors.seuobj, features = c("purkinje_neuron", "oligodendrocyte", "SLC24A4_PEX5L", "vascular_endothelial", "astrocyte", "granule_neuron", "inhibitory_interneuron", "unipolar_brush", "microglia"), group.by = "mnn.reconstructed_snn_res.0.8") + RotatedAxis()
 
+cell_types <- c("purkinje_neuron", "oligodendrocyte", "SLC24A4_PEX5L", "vascular_endothelial", "astrocyte", "granule_neuron", "inhibitory_interneuron", "unipolar_brush", "microglia")
+
+#Violin Plot
+for(cell_type in cell_types){
+  print(VlnPlot(tumors.seuobj, features = c(cell_type), group.by = "mnn.reconstructed_snn_res.0.8"))
+}
+
+#Feature Plot
+for(cell_type in cell_types){
+  print(FeaturePlot(tumors.seuobj, features = c(cell_type), min.cutoff = "q1"))
+}
+
+
+#Subset by cancer type==================
 
 
