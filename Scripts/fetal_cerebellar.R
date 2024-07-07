@@ -222,6 +222,80 @@ for(cell_type in cell_types){
 DimPlot(tumors.seuobj.mb, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
 DimPlot(tumors.seuobj.atrt, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
 DimPlot(tumors.seuobj.dipg, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap")
+DimPlot(tumors.seuobj, group.by = "mnn.reconstructed_snn_res.0.8", reduction = "umap", label = TRUE)
+
+
+#shows if the genes for a cell type appear in the tumor data
+oligodendrocyte.genes[oligodendrocyte.genes %in% rownames(tumors.seuobj)]
+
+
+DotPlot(tumors.seuobj.dipg, features = c("purkinje_neuron", "oligodendrocyte", "SLC24A4_PEX5L", "vascular_endothelial", "astrocyte", "granule_neuron", "inhibitory_interneuron", "unipolar_brush", "microglia"), group.by = "mnn.reconstructed_snn_res.0.8") + RotatedAxis()
+
+
+
+#Day 21 workflow===========================
+
+#load data into counts
+cts <- ReadMtx(mtx = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/matrix.mtx.gz",
+               features = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/features.tsv.gz",
+               cells = "/Users/kaustubhgrama/Desktop/Computer Science/R/Data/Small_Data/barcodes.tsv.gz")
+
+#create seurat object
+seuobj21 <- CreateSeuratObject(counts = cts, project = "day21", min.cells = 3, min.features = 200)
+
+#QC
+seuobj21[["percent.mt"]] <- PercentageFeatureSet(seuobj21, pattern = "^MT-")
+seuobj21 <- subset(seuobj21, subset = nFeature_RNA > 200& nFeature_RNA < 2500 & percent.mt < 5)
+
+#Normalization 
+seuobj21 <- NormalizeData(seuobj21)
+#FindVariableFeatures
+seuobj21 <- FindVariableFeatures(seuobj21, selection.method = "vst", nfeatures = 2000)
+#Scaling
+seuobj21 <- ScaleData(seuobj21, features = rownames(seuobj21))
+#PCA
+seuobj21 <- RunPCA(seuobj21, features = VariableFeatures(object = seuobj21))
+DimHeatmap(seuobj21, dims = 1:18, cells = 500, balanced = TRUE)
+ElbowPlot(seuobj21)
+
+#Clustering
+seuobj21 <- FindNeighbors(seuobj21, dims = 1:15)
+seuobj21 <- FindClusters(seuobj21)
+
+#UMAP
+seuobj21 <- RunUMAP(seuobj21, dims = 1:15)
+
+##Visualization
+DimPlot(seuobj21, reduction = "pca", group.by = "RNA_snn_res.0.8")
+DimPlot(seuobj21, reduction = "umap", group.by = "RNA_snn_res.0.8", label = TRUE)
+
+#Adding Module Scores for each cell type onto day21 cells=============
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=purkinje_neuron.genes), assay = "RNA", name = "purkinje_neuron")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=oligodendrocyte.genes), assay = "RNA", name = "oligodendrocyte")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=SLC24A4_PEX5L.genes), assay = "RNA", name = "SLC24A4_PEX5L")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=vascular_endothelial.genes), assay = "RNA", name = "vascular_endothelial")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=astrocyte.genes), assay = "RNA", name = "astrocyte")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=granule_neuron.genes), assay = "RNA", name = "granule_neuron")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=inhibitory_interneuron.genes), assay = "RNA", name = "inhibitory_interneuron")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=unipolar_brush.genes), assay = "RNA", name = "unipolar_brush")
+seuobj21 <- AddModuleScore(seuobj21, features = list("celltype"=microglia.genes), assay = "RNA", name = "microglia")
+
+##visualization of module scores
+#Dot Plot
+DotPlot(seuobj21, features = c("purkinje_neuron", "oligodendrocyte", "SLC24A4_PEX5L", "vascular_endothelial", "astrocyte", "granule_neuron", "inhibitory_interneuron", "unipolar_brush", "microglia"), group.by = "RNA_snn_res.0.8") + RotatedAxis()
+
+
+#Violin Plot
+for(cell_type in cell_types){
+  print(VlnPlot(seuobj21, features = c(cell_type), group.by = "RNA_snn_res.0.8"))
+}
+
+#Feature Plot
+for(cell_type in cell_types){
+  print(FeaturePlot(seuobj21, features = c(cell_type), min.cutoff = "q1"))
+}
+
+
 
 
 
