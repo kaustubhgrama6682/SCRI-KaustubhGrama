@@ -14,9 +14,9 @@ seuobj115 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal
 seuobj125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj125.RDS")
 
 #tumors
-seuobj_atrt <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_atrt.RDS")
-seuobj_dipg <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_dipg.RDS")
-seuobj_mb <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_mb.RDS")
+seuobj_atrt <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_atrt.RDS")
+seuobj_dipg <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_dipg.RDS")
+seuobj_mb <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_mb.RDS")
 
 #Visualization for developmental days=============
 DimPlot(seuobj89, reduction = "umap", group.by = "Main_cluster_name")
