@@ -83,6 +83,11 @@ PC_1_Negative <-c("PTN", "SLC1A3", "NCKAP5", "SOX2-OT", "NPAS3", "TNC", "GRID2",
 PC_2_Positive <- c("LPPR1", "FSTL4", "IGFBP5", "NTN1", "INSM1", "TRHDE", "RNF220", "PDE1C", "ASPM", "HNRNPA1", "EGR1", "SFRP1", "EBF1", "PTPRK", "PCBP3", "PLXNB2", "RPS29", "EPHA7", "HS3ST3A1", "CYYR1", "CDK6", "CENPF", "EPHA5", "ROR2", "ZEB1", "UNC5C", "TOP2A", "RPS2", "RP11-154H12.3", "HS3ST5")
 PC_2_Negative <- c("PCDH9", "CSMD3", "IL1RAPL1", "CTC-340A15.2", "ZNF804B", "TENM2", "LRRC4C", "CDH12", "LRRTM4", "EPHA6", "RP11-202H2.1", "MGAT4C", "KIRREL3", "KCNIP4", "NKAIN2", "HS3ST4", "KAZN", "DPP6", "DOK6", "SGCZ", "KCNH7", "LUZP2", "MDGA2", "CSMD1", "RP11-384F7.2", "CNTNAP5", "RGS6", "CDH18", "CTC-535M15.2", "CDH20")
 
+PC_5_Positive <- c("DACH1", "ZNF804A", "ST18", "FSTL4", "CCDC102B", "PTPRK", "ZNF536", "PBX3", "NFIA", "GRIA4", "LPPR1", "RNF220", "SEMA6A", "KCNT2", "RUNX1T1", "SV2B", "SDC2", "GREB1L", "SEZ6L", "ANK3", "EPHA7", "CDK6", "PTPRD", "MEIS1", "HS3ST5", "PELI2", "ZBTB20", "MAML3", "GRIN2B", "CACNA2D1")
+PC_5_Negative <- c("TOP2A", "MKI67", "CDK1", "ASPM", "NUSAP1", "CENPF", "DLGAP5", "CENPE", "APOLD1", "KIF14", "KIF18A", "SMC4", "CDCA2", "AC072062.1", "SGOL2", "HIST1H4C", "UBE2C", "CKAP2L", "CDC25C", "CCNB1", "GTSE1", "BUB1", "KIF4A", "CASC5", "KIF11", "SAPCD2", "BIRC5", "DIAPH3", "ARL6IP1", "TPX2")
+
+
+
 seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_1_Positive), assay = "RNA", name = "PC_1_Positive")
 seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_1_Negative), assay = "RNA", name = "PC_1_Negative")
 

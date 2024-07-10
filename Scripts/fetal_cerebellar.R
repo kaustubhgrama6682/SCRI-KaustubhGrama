@@ -98,7 +98,7 @@ DimHeatmap(tumors.seuobj, dims = 1:15, cells = 500, balanced = TRUE)
 tumors.seuobj <- RunUMAP(tumors.seuobj, dims = 1:15)
 tumors.seuobj <- FindNeighbors(tumors.seuobj, dims = 1:15)
 tumors.seuobj <- FindClusters(tumors.seuobj)
-tumors.seuobj <- FindClusters(tumors.seuobj, resolution = 0.5)
+
 
 DimPlot(tumors.seuobj, reduction = "umap", group.by = "seurat_clusters")
 DimPlot(tumors.seuobj, reduction = "umap", group.by = "orig.ident")
@@ -298,6 +298,10 @@ for(cell_type in cell_types){
 
 
 
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("PC"=PC_5_Positive), assay = "RNA", name = "PC_5_Positive")
+tumors.seuobj <- AddModuleScore(tumors.seuobj, features = list("PC"=PC_5_Negative), assay = "RNA", name = "PC_5_Negative")
+FeaturePlot(tumors.seuobj, features = c("PC_5_Positive1"), min.cutoff = "q1")
+FeaturePlot(tumors.seuobj, features = c("PC_5_Negative1"), min.cutoff = "q1")
 
 
 
