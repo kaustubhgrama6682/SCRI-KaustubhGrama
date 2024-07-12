@@ -94,7 +94,11 @@ seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, featu
 seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_2_Positive), assay = "RNA", name = "PC_2_Positive")
 seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_2_Negative), assay = "RNA", name = "PC_2_Negative")
 
-pcs <- c("PC_1_Positive1", "PC_1_Negative1", "PC_2_Positive1", "PC_2_Negative1")
+seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_5_Positive), assay = "RNA", name = "PC_5_Positive")
+seuobj125_astrocyte_granule <- AddModuleScore(seuobj125_astrocyte_granule, features = list("PC"=PC_5_Negative), assay = "RNA", name = "PC_5_Negative")
+
+
+pcs <- c("PC_1_Positive1", "PC_1_Negative1", "PC_2_Positive1", "PC_2_Negative1", "PC_5_Positive1", "PC_5_Negative1")
 
 #Feature Plot
 for(pc in pcs){
@@ -104,7 +108,10 @@ for(pc in pcs){
 DimPlot(seuobj125_astrocyte_granule, group.by = "Main_cluster_name", label = TRUE)
 
 
-
+seuobj125 <- AddModuleScore(seuobj125, features = list("PC"=PC_5_Positive), assay = "RNA", name = "PC_5_Positive")
+seuobj125 <- AddModuleScore(seuobj125, features = list("PC"=PC_5_Negative), assay = "RNA", name = "PC_5_Negative")
+FeaturePlot(seuobj125, features = c("PC_5_Positive1"), min.cutoff = "q1")
+FeaturePlot(seuobj125, features = c("PC_5_Negative1"), min.cutoff = "q1")
 
 
 

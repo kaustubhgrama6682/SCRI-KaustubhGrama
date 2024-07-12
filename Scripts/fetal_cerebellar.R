@@ -7,11 +7,11 @@ library(tidyr)
 
 #load the data===================
 #developmental days
-seuobj89 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj89.RDS")
-seuobj94 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj94.RDS")
-seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
-seuobj115 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj115.RDS")
-seuobj125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj125.RDS")
+seuobj89 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj89.RDS")
+seuobj94 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj94.RDS")
+seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
+seuobj115 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj115.RDS")
+seuobj125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj125.RDS")
 
 #tumors
 seuobj_atrt <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_atrt.RDS")
