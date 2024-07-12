@@ -150,12 +150,14 @@ Day115_Topic_12 <- c("LRRTM4", "PTN", "DACH1", "SLC1A3", "TNC", "PTPRM", "GPM6B"
 Day125_Topic_33 <- c("LINC00669", "LSAMP", "NLGN1", "DCC", "DIAPH3", "CENPP", "DLEU2", "RFC3", "MKI67", "APOLD1", "WWOX", "TOP2A", "CENPF", "RAD51B", "EGFEM1P")
 
 top15s <- c(Day89_Topic_14_top15, Day94_Topic_27_top15, Day110_Topic14_top15, Day115_Topic_12, Day125_Topic_33)
-top15names <- c("Day89_Topic_14_top15", "Day94_Topic_27_top15","Day110_Topic14_top15", "Day115_Topic_12", "Day125_Topic_33")
+top15names <- c("Day89_Topic_14_top151", "Day94_Topic_27_top151","Day110_Topic14_top151", "Day115_Topic_121", "Day125_Topic_331")
 for(i in 1:5){
-  seuobj1_2_8 <- AddModuleScore(seuobj1_2_8, features = list("genes" = top15s[i]), assay = "RNA", name = top15names[i])
+  print(seuobj1_2_8 <- AddModuleScore(seuobj1_2_8, features = list("genes" = top15s[i]), assay = "RNA", name = top15names[i]))
 }
 
-
+for(j in top15names){
+  print(FeaturePlot(seuobj1_2_8, features = c(j)))
+}
 
 
 
