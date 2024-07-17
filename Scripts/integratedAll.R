@@ -21,6 +21,30 @@ seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal
 seuobj115 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj115.RDS")
 seuobj125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj125.RDS")
 
+#integration of all days
+
+days <- c(
+          "115" = seuobj115,
+          "125" = seuobj125)
+
+features <- SelectIntegrationFeatures(object.list = days)
+anchors <- FindIntegrationAnchors(object.list = days, anchor.features = features)
+
+
+seuobj_115_125 <- IntegrateData(anchorset = anchors)
+
+seuobj_115_125 <- NormalizeData(seuobj_115_125)
+seuobj_115_125 <- FindVariableFeatures(seuobj_115_125)
+
+seuobj_115_125 <- ScaleData(seuobj_115_125)
+seuobj_115_125 <- RunPCA(seuobj_115_125)
+seuobj_115_125 <- RunUMAP(seuobj_115_125, dims = 1:30)
+seuobj_115_125 <- FindNeighbors(seuobj_115_125, dims = 1:30)
+seuobj_115_125 <- FindClusters(seuobj_115_125)
+
+saveRDS(seuobj_115_125, file = "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/seuobj_115_125.RDS")
+
+
 #tumors
 seuobj_atrt <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_atrt.RDS")
 seuobj_dipg <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj_dipg.RDS")
@@ -182,9 +206,10 @@ for(x in 1:5){
 
 
 
+saveRDS(seuobj_all_days, file = "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/seuobj_all_days_kaustubh.RDS")
 
 
 
-
+#integrate day 125 and 115
 
 
