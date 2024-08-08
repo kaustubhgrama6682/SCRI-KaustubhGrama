@@ -194,6 +194,8 @@ topgenes_logodds <- c()
 for(i in 1:nrow(rsq_df)) {
   if (rsq_df$rsquare[i] >= 0.4) {
     topgenes_logodds <- append(topgenes_logodds, rsq_df$gene[i])
+  }else{
+    break
   }
 }
 
@@ -364,7 +366,7 @@ auc_testing_performance <- auc_testing_performance@y.values
 tuning_metrics_df <- data.frame(cutoffs = NA, f_measure = NA, precision = NA, recall = NA)
 
 #beta value for calculating f measure
-beta <- 0.1
+beta <- 0.5
 
 #iterating through different cutoff values for the predicted classes and calculating metrics for each value
 for(cutoff in seq(0.2, 1, 0.1)){ # switch 0.1 0.01
@@ -479,7 +481,7 @@ ggplot(df_b2, aes(x = cutoffs, y = value, color = metric)) + geom_point()
 
 
 
-predicted.classes <- (adjusted_probability > 0.2)
+predicted.classes <- (adjusted_probability > 0.0001)
 
 
 

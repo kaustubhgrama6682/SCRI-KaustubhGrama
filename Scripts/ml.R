@@ -316,13 +316,14 @@ for(i in 1 : 30) {
 #astrocyte model
 #getting the top genes from rsq_)df
 topgenes_logodds <- c()
-for(i in 1 : 30) {
+for(i in 1 : 2000) {
   if (rsq_df$rsquare[i] >= 0.4) {
     topgenes_logodds <- append(topgenes_logodds, rsq_df$gene[i])
   }
 }
 
 astrocyte.markers <- c("S100B","GFAP", "APOE", "AQP4")
+astrocyte.markers <- astrocyte.markers[!astrocyte.markers %in% topgenes_logodds]
 topgenes_logodds <- append(topgenes_logodds, astrocyte.markers)
 
 
@@ -654,7 +655,7 @@ auc_testing_performance <- auc_testing_performance@y.values
 tuning_metrics_df <- data.frame(cutoffs = NA, f_measure = NA, precision = NA, recall = NA)
 
 #beta value for calculating f measure
-beta <- 0.1
+beta <- 0.5
 
 #iterating through different cutoff values for the predicted classes and calculating metrics for each value
 for(cutoff in seq(0.2, 1, 0.1)){ # switch 0.1 0.01
@@ -791,6 +792,6 @@ seuobj110$probabilities <- probabilities
 seuobj110$predicted_astrocytes_temp <- predicted.classes
 
 seuobj110$probabilities_neg <- 1-probabilities
-
+DimPlot(seuobj110, group.by = "predicted_astrocytes_temp")
 FeaturePlot(seuobj110, features = "probabilities_neg", min.cutoff = "q1")
 
