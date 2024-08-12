@@ -258,7 +258,7 @@ day110_gene_expression_data$celltype <- 1
 day110_gene_expression_data$celltype[day110_gene_expression_data$Main_cluster_name == "Granule neurons"] <- 0
 
 # Making predictions
-probabilities <- model_lm %>% predict(day110_gene_expression_data, type = "response") 
+probabilities <- model_lm %>% predict(day110_gene_expression_data, type = "raw") 
 predicted.classes <- ifelse(probabilities > 0.6, 1, 0)
 
 
@@ -437,8 +437,21 @@ importance(model_lm)
 
 
 
+control <- trainControl(method = "cv", number = 5)
+grid <- expand.grid(mtry = c(3, 4, 5, 6))
+ 
 
+refined_model_lm <- train(
+  celltype ~ ., 
+  data = training.data.topgenes, 
+  method = "rf", 
+  trControl = control, 
+  tuneGrid = grid,
+  ntree = 1000,  # More trees
+  importance = TRUE  # To assess feature importance
+)
 
+old_model_lm <- model_lm
 
-
+model_lm <- refined_model_lm
 
