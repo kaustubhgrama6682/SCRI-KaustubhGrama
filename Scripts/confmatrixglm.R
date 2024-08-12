@@ -12,7 +12,7 @@ microglia_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data
 purkinje_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_purkinje_neurons.RDS")
 SLC_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_SLC24A4_PEX5L_positive_cells.RDS")
 
-models <- list("Astrocytes" = astrocyte_model, 
+model_list <- list("Astrocytes" = astrocyte_model, 
                "Inhibitory interneurons" = II_model, 
                "Unipolar brush cells" = UBC_model, 
                "Oligodendrocytes" = oligodendrocyte_model,
@@ -167,8 +167,8 @@ for(i in names(model_list)){
   predicted.classes110 <- ifelse(adjusted_probability110 > 0.6, 1, 0) #adjusted prob to change
   predicted.classes94 <- ifelse(adjusted_probability94 > 0.6, 1, 0) #adjusted prob to change
   
-  assign(paste(conf_matrix, i, "glm110", sep = ""), confusionMatrix(table(predicted.classes110, day110_gene_expression_data$celltype)))
-  assign(paste(conf_matrix, i, "glm94", sep = ""), confusionMatrix(table(predicted.classes94, day94_gene_expression_data$celltype)))
+  assign(paste("conf_matrix", i, "glm110", sep = ""), confusionMatrix(table(predicted.classes110, day110_gene_expression_data$celltype)))
+  assign(paste("conf_matrix", i, "glm94", sep = ""), confusionMatrix(table(predicted.classes94, day94_gene_expression_data$celltype)))
   
 }
 
