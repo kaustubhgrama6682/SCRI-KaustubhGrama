@@ -2,19 +2,26 @@
 library(ROCR)
 library(car)
 seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
-astrocyte_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/model_lm_astrocyte.RDS")
+astrocyte_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/model_lm_astrocyte.RDS")
 II_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/model_lm_inhibitory_interneurons.RDS")
 UBC_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_unipolar_brush_cells.RDS")
 oligodendrocyte_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_oligodendrocytes.RDS")
-
+gn_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/gn_model.RDS")
+vascular_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_vascular_endothelial_cells.RDS")
+microglia_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_microglia.RDS")
+purkinje_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_purkinje_neurons.RDS")
+SLC_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_SLC24A4_PEX5L_positive_cells.RDS")
 
 models <- list("Astrocytes" = astrocyte_model, 
                "Inhibitory interneurons" = II_model, 
                "Unipolar brush cells" = UBC_model, 
-               "Oligodendrocytes" = oligodendrocyte_model)
+               "Oligodendrocytes" = oligodendrocyte_model,
+               "Granule neurons" = gn_model,
+               "Vascular endothelial cells" = vascular_model,
+               "Microglia" = microglia_model,
+               "Purkinje neurons" = purkinje_model,
+               "SLC24A4_PEX5L positive cells" = SLC_model)
 
-models_str <- c("astrocyte", "II", "UBC", "oligodendrocyte")
-cell_types <- c("Astrocytes", "Inhibitory interneurons", "Unipolar brush cells", "Oligodendrocytes")
 
 
 
@@ -78,6 +85,47 @@ original_odds <- 72266/217612
 # 
 # adjusted_probability = 1/(1+(1/adjusted_odds))
 
+seuobj_115_125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/seuobj_115_125.RDS")
+
+#creating data frame of gene expression data
+day115_125_gene_expression_data <- as.data.frame(seuobj_115_125@assays$integrated$data)
+
+# switching cols and rows by transposing
+day115_125_gene_expression_data <- t(day115_125_gene_expression_data)
+
+
+# make data remain as data.frame
+day115_125_gene_expression_data <- data.frame(day115_125_gene_expression_data)
+
+
+# round vals to 2 spots
+day115_125_gene_expression_data <- (round(day115_125_gene_expression_data, 2))
+
+
+# add cell id col to metadata of seuobj
+seuobj_115_125$cellid <- rownames(seuobj_115_125@meta.data)
+
+
+# making a metadata dataframe of seuobj with main cluster and cell id
+metadata_df <- seuobj_115_125@meta.data[, c("Main_cluster_name", "cellid")]
+
+
+# adding cell ids to metadata
+day115_125_gene_expression_data$cellid <- rownames(day115_125_gene_expression_data)
+
+
+# combining data and metadata
+day115_125_gene_expression_data <- cbind(day115_125_gene_expression_data, metadata_df)
+
+
+# removing the cell id from the expression dataframe
+day115_125_gene_expression_data$cellid <- NULL
+
+
+
+
+
+
 
 
 for(i in names(models)){
@@ -90,7 +138,7 @@ for(i in names(models)){
   adjusted_odds <- scoring_odds * (original_odds/undersample_odds)
   adjusted_probability = 1/(1+(1/adjusted_odds))
   colname <- paste(i, "probability")
-  seuobj110@meta.data[, colname] <- adjusted_probability
+  seuobj110@meta.data[, colname] <- 1 - adjusted_probability
   
   
   

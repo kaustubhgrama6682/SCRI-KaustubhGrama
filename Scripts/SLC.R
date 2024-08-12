@@ -7,7 +7,7 @@ library(broom)
 library(dplyr)
 library(car)
 library(Seurat)
-library(caret)
+
 
 seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
 
@@ -75,11 +75,11 @@ for(gene in colnames(day115_125_gene_expression_data)[colnames(day115_125_gene_e
   for(n in unique(count_df$count)){
     
     # count for all astrocytes
-    n_vascular_endothelial_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "Vascular endothelial cells",gene]==n)
+    n_SLC24A4_PEX5L_positive_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "SLC24A4_PEX5L positive cells",gene]==n)
     
     # probability of a cell being an astrocyte
     # number of astrocytes w unique count value for spp1 / all cells
-    percent <- n_vascular_endothelial_cells/ sum(day115_125_gene_expression_data[,gene]==n)
+    percent <- n_SLC24A4_PEX5L_positive_cells/ sum(day115_125_gene_expression_data[,gene]==n)
     
     # log odds
     logodds <- log(percent/(1-percent))
@@ -149,11 +149,11 @@ rsq_df <- rsq_df[order(-rsq_df$rsquare),]
 #     #iterating through all unique count values
 #     for(n in unique(count_df$count)){
 #       # count for all astrocytes
-#       n_vascular_endothelial_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "Vascular endothelial cells",gene]==n)
+#       n_SLC24A4_PEX5L_positive_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "SLC24A4_PEX5L positive cells",gene]==n)
 #       
 #       # probability of a cell being an astrocyte
 #       # number of astrocytes w unique count value for spp1 / all cells
-#       percent <- n_vascular_endothelial_cells/ sum(day115_125_gene_expression_data[,gene]==n)
+#       percent <- n_SLC24A4_PEX5L_positive_cells/ sum(day115_125_gene_expression_data[,gene]==n)
 #       
 #       # log odds
 #       logodds <- log(percent/(1-percent))
@@ -237,10 +237,10 @@ testing.data.topgenes <- testing.data[, c(topgenes_logodds, "Main_cluster_name")
 
 #creating binary predcictor column (astrocyte = 1, other = 0)
 training.data.topgenes$celltype <- 1
-training.data.topgenes$celltype[training.data.topgenes$Main_cluster_name == "Vascular endothelial cells"] <- 0
+training.data.topgenes$celltype[training.data.topgenes$Main_cluster_name == "SLC24A4_PEX5L positive cells"] <- 0
 
 testing.data.topgenes$celltype <- 1
-testing.data.topgenes$celltype[testing.data.topgenes$Main_cluster_name == "Vascular endothelial cells"] <- 0
+testing.data.topgenes$celltype[testing.data.topgenes$Main_cluster_name == "SLC24A4_PEX5L positive cells"] <- 0
 
 
 
@@ -321,7 +321,7 @@ day110_gene_expression_data$cellid <- NULL
 
 
 day110_gene_expression_data$celltype <- 1
-day110_gene_expression_data$celltype[day110_gene_expression_data$Main_cluster_name == "Vascular endothelial cells"] <- 0
+day110_gene_expression_data$celltype[day110_gene_expression_data$Main_cluster_name == "SLC24A4_PEX5L positive cells"] <- 0
 
 # Making predictions
 probabilities <- step.model.forward %>% predict(day110_gene_expression_data, type = "response") 
@@ -341,7 +341,7 @@ confusionMatrix(table(predicted.classes, day110_gene_expression_data$celltype))
 
 original_odds <- 72266/217612
 
-undersample_odds <- sum(training.data$Main_cluster_name == "Vascular endothelial cells")/sum(training.data$Main_cluster_name != "Vascular endothelial cells")
+undersample_odds <- sum(training.data$Main_cluster_name == "SLC24A4_PEX5L positive cells")/sum(training.data$Main_cluster_name != "SLC24A4_PEX5L positive cells")
 
 scoring_odds <- probabilities/(1-probabilities)
 
@@ -485,7 +485,7 @@ ggplot(df_b2, aes(x = cutoffs, y = value, color = metric)) + geom_point()
 
 
 
-predicted.classes <- (adjusted_probability > 0.2)
+predicted.classes <- (adjusted_probability >0.7)
 
 
 
@@ -495,11 +495,11 @@ predicted.classes <- (adjusted_probability > 0.2)
 
 seuobj110$probabilities <- probabilities
 
-seuobj110$predicted_vascular_endothelial_cells_temp <- predicted.classes
+seuobj110$predicted_SLC24A4_PEX5L_positive_cells_temp <- predicted.classes
 
 seuobj110$probabilities_neg <- 1-probabilities
 
-DimPlot(seuobj110, group.by = "predicted_vascular_endothelial_cells_temp")
+DimPlot(seuobj110, group.by = "predicted_SLC24A4_PEX5L_positive_cells_temp")
 FeaturePlot(seuobj110, features = "probabilities_neg", min.cutoff = "q1")
 
 
@@ -511,7 +511,7 @@ summary(step.model.both)
 conf_matrix
 
 
-saveRDS(step.model.both, "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_vascular_endothelial_cells.RDS")
+saveRDS(step.model.both, "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_SLC24A4_PEX5L_positive_cells.RDS")
 
 
 

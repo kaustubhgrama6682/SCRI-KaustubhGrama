@@ -7,9 +7,8 @@ library(broom)
 library(dplyr)
 library(car)
 library(Seurat)
-library(caret)
-
-seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
+library(randomForest)
+library(datasets)
 
 seuobj_115_125 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/seuobj_115_125.RDS")
 
@@ -48,38 +47,35 @@ day115_125_gene_expression_data <- cbind(day115_125_gene_expression_data, metada
 day115_125_gene_expression_data$cellid <- NULL
 
 
-
 #create a data frame to store r^2 values for each gene
+day115_125_gene_expression_data$cellid <- NULL
 rsq_df <- data.frame(gene = colnames(day115_125_gene_expression_data)[colnames(day115_125_gene_expression_data) != "Main_cluster_name"], rsquare = rep(NA, 2000))
 
 rsq_df[]
 
-#setting basepath to save png files
-basepath <- "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/LogOdds_plots_Astrocytes/highest_r^2/above0.2/"
+
+
 
 #for loop to populate rsq_df
 for(gene in colnames(day115_125_gene_expression_data)[colnames(day115_125_gene_expression_data) != "Main_cluster_name"]){
-  #tells name of current gene
-  message(gene)
-  
+
   #filling count with gene expression values for all cells for this gene
   count <- unique(day115_125_gene_expression_data[,gene])
   
   #creating a dataframe with percent and logodds columns corresponding to probability that cell is an astrocyte depending on counts for that gene
   count_df <- data.frame("count" = count, percent = rep(0, length(count)), logodds = rep(0, length(count)))
   
-  #displays that coutn df was created
-  message('Count df created')
+  
   
   #for loop iterating through each unique count value
   for(n in unique(count_df$count)){
     
     # count for all astrocytes
-    n_vascular_endothelial_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "Vascular endothelial cells",gene]==n)
+    n_granule_neurons <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "Granule neurons",gene]==n)
     
     # probability of a cell being an astrocyte
     # number of astrocytes w unique count value for spp1 / all cells
-    percent <- n_vascular_endothelial_cells/ sum(day115_125_gene_expression_data[,gene]==n)
+    percent <- n_granule_neurons/ sum(day115_125_gene_expression_data[,gene]==n)
     
     # log odds
     logodds <- log(percent/(1-percent))
@@ -107,16 +103,6 @@ for(gene in colnames(day115_125_gene_expression_data)[colnames(day115_125_gene_e
     
     #adding r62 value from the model into rsq_df
     rsq_df[rsq_df$gene==gene, "rsquare"] <- r_squared
-    
-    # plot <- ggplot(count_df, aes(x = count, y = logodds)) +
-    #   geom_point(stat = "identity") + geom_smooth(method = "lm") +
-    #   ggtitle(paste0("Log odds for ", gene, "\n(Astrocytes)")) + stat_poly_eq(use_label(c("eq", "R2")))
-    # 
-    # 
-    # 
-    # png(paste0(basepath, gene, ".png"), width = 300, height = 300)
-    # print(plot)
-    # dev.off()
   }
 }
 
@@ -127,84 +113,22 @@ for(gene in colnames(day115_125_gene_expression_data)[colnames(day115_125_gene_e
 rsq_df <- rsq_df[order(-rsq_df$rsquare),]
 
 
-# #iterating through the 30 rows in rsq_df
-# for(i in 1 : 30) {
-#   
-#   #if the r^2 value is above 0.2 proceed
-#   if (rsq_df$rsquare[i] >= 0.4) {
-#     
-#     print(paste0("COUNT",i))
-#     
-#     #getting the gene associated with that row
-#     gene <- rsq_df$gene[i]
-#     message(gene)
-#     
-#     #making a counts that have unique count value
-#     count <- unique(day115_125_gene_expression_data[,gene])
-#     #count df with logodds and percent columns
-#     count_df <- data.frame("count" = count, percent = rep(0, length(count)), logodds = rep(0, length(count)))
-#     
-#     message('Count df created')
-#     
-#     #iterating through all unique count values
-#     for(n in unique(count_df$count)){
-#       # count for all astrocytes
-#       n_vascular_endothelial_cells <- sum(day115_125_gene_expression_data[day115_125_gene_expression_data$Main_cluster_name == "Vascular endothelial cells",gene]==n)
-#       
-#       # probability of a cell being an astrocyte
-#       # number of astrocytes w unique count value for spp1 / all cells
-#       percent <- n_vascular_endothelial_cells/ sum(day115_125_gene_expression_data[,gene]==n)
-#       
-#       # log odds
-#       logodds <- log(percent/(1-percent))
-#       
-#       # adding all variables to count_df
-#       count_df[count_df$count == n, "percent"] <- percent
-#       count_df[count_df$count == n, "logodds"] <- logodds
-#     }
-#     # print(count_df)
-#     # table(count_df$logodds==-Inf)
-#     
-#     count_df <- count_df[count_df$logodds != -Inf, ]
-#     count_df <- count_df[count_df$logodds != Inf, ]
-#     
-#     if(nrow(count_df) >= 20){
-#       
-#       
-#       # model <- lm(logodds ~ count, data = count_df)
-#       # model_summary <- glance(model)
-#       # r_squared <- model_summary$r.squared
-#       #
-#       # rsq_df[rsq_df$gene==gene, "rsquare"] <- r_squared
-#       
-#       # plot <- ggplot(count_df, aes(x = count, y = logodds)) +
-#       #   geom_point(stat = "identity") + geom_smooth(method = "lm") +
-#       #   ggtitle(paste0("Log odds for ", gene, "\n(Astrocytes)")) + stat_poly_eq(use_label(c("eq", "R2")))
-#       # 
-#       # 
-#       # 
-#       # png(paste0(basepath, gene, "TOP30",".png"), width = 300, height = 300)
-#       # print(plot)
-#       # dev.off()
-#     }
-#   }
-#   
-# }
+
 
 #astrocyte model
 #getting the top genes from rsq_)df
 topgenes_logodds <- c()
-for(i in 1:nrow(rsq_df)) {
+for(i in 1 : length(rsq_df)) {
   if (rsq_df$rsquare[i] >= 0.4) {
     topgenes_logodds <- append(topgenes_logodds, rsq_df$gene[i])
-  }
-  else{
+  }else{
     break
   }
 }
 
-
-
+astrocyte.markers <- c("S100B","GFAP", "APOE", "AQP4")
+astrocyte.markers <- astrocyte.markers[!astrocyte.markers %in% topgenes_logodds]
+topgenes_logodds <- append(topgenes_logodds, astrocyte.markers)
 
 
 
@@ -237,10 +161,10 @@ testing.data.topgenes <- testing.data[, c(topgenes_logodds, "Main_cluster_name")
 
 #creating binary predcictor column (astrocyte = 1, other = 0)
 training.data.topgenes$celltype <- 1
-training.data.topgenes$celltype[training.data.topgenes$Main_cluster_name == "Vascular endothelial cells"] <- 0
+training.data.topgenes$celltype[training.data.topgenes$Main_cluster_name == "Granule neurons"] <- 0
 
 testing.data.topgenes$celltype <- 1
-testing.data.topgenes$celltype[testing.data.topgenes$Main_cluster_name == "Vascular endothelial cells"] <- 0
+testing.data.topgenes$celltype[testing.data.topgenes$Main_cluster_name == "Granule neurons"] <- 0
 
 
 
@@ -250,7 +174,7 @@ testing.data.topgenes$Main_cluster_name <- NULL
 
 
 #training glm with 0.75 GE data
-model_lm <- glm(celltype ~. , data = training.data.topgenes, family = "binomial")
+model_lm <- randomForest(celltype ~. , data = training.data.topgenes, family = "binomial")
 
 #testing GLM with 0.25 GE data
 predictions <- model_lm %>% predict(testing.data.topgenes)
@@ -264,27 +188,37 @@ performance <- data.frame(RMSE = RMSE(predictions, testing.data.topgenes$celltyp
 summary(model_lm)
 performance
 
-#vif to determine multicollinearity
-car::vif(model_lm)
+
+
 
 #stepwise AIC 
 #stepwise regression --forward
 library(MASS)
 
 
-step.model.forward <- stepAIC(model_lm, direction = "forward", trace = 5)
-summary(step.model.forward)
+# step.model.forward <- stepAIC(model_lm, direction = "forward", trace = 5)
+# summary(step.model.forward)
+# 
+# step.model.backward <- stepAIC(model_lm, direction = "backward", trace = 5)
+# summary(step.model.backward)
+# 
+# step.model.both <- stepAIC(model_lm, direction = "both", trace = 5)
+# summary(step.model.both)
 
-step.model.backward <- stepAIC(model_lm, direction = "backward", trace = 5)
-summary(step.model.backward)
 
-step.model.both <- stepAIC(model_lm, direction = "both", trace = 5)
-summary(step.model.both)
+
+
+
+
+
+
+
+
 
 
 
 #testing with day110 astrocyte model
-
+seuobj110 <- readRDS('/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS')
 
 day110_gene_expression_data <- as.data.frame(seuobj110@assays$RNA$data)
 
@@ -321,10 +255,10 @@ day110_gene_expression_data$cellid <- NULL
 
 
 day110_gene_expression_data$celltype <- 1
-day110_gene_expression_data$celltype[day110_gene_expression_data$Main_cluster_name == "Vascular endothelial cells"] <- 0
+day110_gene_expression_data$celltype[day110_gene_expression_data$Main_cluster_name == "Granule neurons"] <- 0
 
 # Making predictions
-probabilities <- step.model.forward %>% predict(day110_gene_expression_data, type = "response") 
+probabilities <- model_lm %>% predict(day110_gene_expression_data, type = "response") 
 predicted.classes <- ifelse(probabilities > 0.6, 1, 0)
 
 
@@ -341,7 +275,7 @@ confusionMatrix(table(predicted.classes, day110_gene_expression_data$celltype))
 
 original_odds <- 72266/217612
 
-undersample_odds <- sum(training.data$Main_cluster_name == "Vascular endothelial cells")/sum(training.data$Main_cluster_name != "Vascular endothelial cells")
+undersample_odds <- sum(training.data$Main_cluster_name == "Granule neurons")/sum(training.data$Main_cluster_name != "Granule neurons")
 
 scoring_odds <- probabilities/(1-probabilities)
 
@@ -370,7 +304,7 @@ auc_testing_performance <- auc_testing_performance@y.values
 tuning_metrics_df <- data.frame(cutoffs = NA, f_measure = NA, precision = NA, recall = NA)
 
 #beta value for calculating f measure
-beta <- 0.1
+beta <- 0.5
 
 #iterating through different cutoff values for the predicted classes and calculating metrics for each value
 for(cutoff in seq(0.2, 1, 0.1)){ # switch 0.1 0.01
@@ -398,9 +332,8 @@ for(cutoff in seq(0.2, 1, 0.1)){ # switch 0.1 0.01
   
 }
 
-
-# -------------------------------------------------------------------------
-
+#save the nde
+saveRDS(model_lm, file = "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/rf/gnrf.RDS")
 
 #setting tuning metrics to the one for the regular model
 tuning_metrics_df_model_lm <- tuning_metrics_df
@@ -426,22 +359,6 @@ ggplot(df, aes(x = cutoffs, y = value, color = metric)) + geom_point()
 
 
 
-
-
-# # original odds = number of astrocytes / number of not-astrocytes in training data
-# orig_odds = (72266/217612)
-# # undersample odds <- number of astrocytes / number of not-astrocytes in undersampled data
-# undersampled_odds <- (sum(training.data$Main_cluster_name == "Astrocytes")/(sum(training.data$Main_cluster_name != "Astrocytes")))
-# # scoring odds = predicted probabilities / (1-predicted probabilities)
-# scoring_odds <- (probabilities) / (1-probabilities)
-# # adjusted odds = scoring odds * original odds / undersampled odds
-# adj_odds = scoring_odds * orig_odds / undersampled_odds
-# # adjusted probability = 1 / (1 + (1 / adjusted odds))
-# adj_prob = 1 / (1 + (1 / adj_odds))
-# # adjust our predictions with adjusted probabilities
-# predicted.classes <- ifelse(adj_prob > 0.6, 1, 0) # adj prob to change
-# conf_matrix <- confusionMatrix(table(predicted.classes, day110_gene_expression_data$celltype))
-# 
 
 TuningMetrics.fn <- function(beta, adjusted_probability, seuobj110){
   for(cutoff in seq(0.2, 0.9, 0.05)){ # switch 0.1 to 0.01
@@ -485,33 +402,42 @@ ggplot(df_b2, aes(x = cutoffs, y = value, color = metric)) + geom_point()
 
 
 
-predicted.classes <- (adjusted_probability > 0.2)
+predicted.classes <- (adjusted_probability > 0.9)
 
 
 
-
-
+# 
+# for(gene in astrocyte.markers){
+#   plot <- ggplot(count_df, aes(x = count, y = logodds)) +
+#     geom_point(stat = "identity") + geom_smooth(method = "lm") +
+#     ggtitle(paste0("Log odds for ", gene, "\n(Granule neurons)")) + stat_poly_eq(use_label(c("eq", "R2")), formula = y~x)
+#   
+#   
+#   
+#   png(paste0(basepath, gene, ".png"), width = 300, height = 300)
+#   print(plot)
+#   dev.off()
+# }
 
 
 seuobj110$probabilities <- probabilities
 
-seuobj110$predicted_vascular_endothelial_cells_temp <- predicted.classes
+seuobj110$predicted_granule_neurons_temp <- predicted.classes
 
 seuobj110$probabilities_neg <- 1-probabilities
-
-DimPlot(seuobj110, group.by = "predicted_vascular_endothelial_cells_temp")
+DimPlot(seuobj110, group.by = "predicted_granule_neurons_temp")
 FeaturePlot(seuobj110, features = "probabilities_neg", min.cutoff = "q1")
 
 
+varImpPlot(model_lm,
+           sort = T,
+           n.var = 10,
+           main = "Top 10 - Variable Importance")
+importance(model_lm)
 
-summary(model_lm)
-summary(step.model.forward)
-summary(step.model.backward)
-summary(step.model.both)
-conf_matrix
 
 
-saveRDS(step.model.both, "/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/step.model.both_vascular_endothelial_cells.RDS")
+
 
 
 
