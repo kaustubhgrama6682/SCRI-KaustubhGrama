@@ -792,6 +792,6 @@ seuobj110$probabilities <- probabilities
 seuobj110$predicted_astrocytes_temp <- predicted.classes
 
 seuobj110$probabilities_neg <- 1-probabilities
-DimPlot(seuobj110, group.by = "predicted_astrocytes_temp")
+
 FeaturePlot(seuobj110, features = "probabilities_neg", min.cutoff = "q1")
 

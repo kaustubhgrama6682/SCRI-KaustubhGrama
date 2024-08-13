@@ -2,25 +2,25 @@
 seuobj94 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj94.RDS")
 seuobj110 <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/drive-download-20240702T163704Z-001/seuobj110.RDS")
 
-astrocyte_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/model_lm_astrocyte.RDS")
-II_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/model_lm_inhibitory_interneurons.RDS")
-UBC_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_unipolar_brush_cells.RDS")
-oligodendrocyte_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_oligodendrocytes.RDS")
-gn_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/gn_model.RDS")
-vascular_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_vascular_endothelial_cells.RDS")
-microglia_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_microglia.RDS")
-purkinje_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_purkinje_neurons.RDS")
-SLC_model <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_SLC24A4_PEX5L_positive_cells.RDS")
+astrocyte_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/model_lm_astrocyte.RDS")
+II_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/model_lm_inhibitory_interneurons.RDS")
+UBC_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_unipolar_brush_cells.RDS")
+oligodendrocyte_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_oligodendrocytes.RDS")
+gn_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/gn_model.RDS")
+vascular_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_vascular_endothelial_cells.RDS")
+microglia_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_microglia.RDS")
+purkinje_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_purkinje_neurons.RDS")
+SLC_model_glm <- readRDS("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/glm/step.model.both_SLC24A4_PEX5L_positive_cells.RDS")
 
-model_list <- list("Astrocytes" = astrocyte_model, 
-               "Inhibitory interneurons" = II_model, 
-               "Unipolar brush cells" = UBC_model, 
-               "Oligodendrocytes" = oligodendrocyte_model,
-               "Granule neurons" = gn_model,
-               "Vascular endothelial cells" = vascular_model,
-               "Microglia" = microglia_model,
-               "Purkinje neurons" = purkinje_model,
-               "SLC24A4_PEX5L positive cells" = SLC_model)
+model_list <- list("Astrocytes" = astrocyte_model_glm, 
+               "Inhibitory interneurons" = II_model_glm, 
+               "Unipolar brush cells" = UBC_model_glm, 
+               "Oligodendrocytes" = oligodendrocyte_model_glm,
+               "Granule neurons" = gn_model_glm,
+               "Vascular endothelial cells" = vascular_model_glm,
+               "Microglia" = microglia_model_glm,
+               "Purkinje neurons" = purkinje_model_glm,
+               "SLC24A4_PEX5L positive cells" = SLC_model_glm)
 
 
 
@@ -149,8 +149,8 @@ for(i in names(model_list)){
   day94_gene_expression_data$celltype <- 1
   day94_gene_expression_data$celltype[day94_gene_expression_data$Main_cluster_name == i] <- 0
   
-  probabilities110 <- models[[i]] %>% predict(day110_gene_expression_data, type = "response") 
-  probabilities94 <- models[[i]] %>% predict(day94_gene_expression_data, type = "response") 
+  probabilities110 <- model_list[[i]] %>% predict(day110_gene_expression_data, type = "response") 
+  probabilities94 <- model_list[[i]] %>% predict(day94_gene_expression_data, type = "response") 
   
   original_odds <- 72266/217612
   undersample_odds <- sum(training.data$Main_cluster_name == i)/sum(training.data$Main_cluster_name != i)
@@ -169,6 +169,14 @@ for(i in names(model_list)){
   
   assign(paste("conf_matrix", i, "glm110", sep = ""), confusionMatrix(table(predicted.classes110, day110_gene_expression_data$celltype)))
   assign(paste("conf_matrix", i, "glm94", sep = ""), confusionMatrix(table(predicted.classes94, day94_gene_expression_data$celltype)))
+  
+  
+  seuobj110$probabilities_neg110 <- 1-adjusted_probability110
+  # seuobj94$probabilities_neg94 <- 1-adjusted_probability94
+  
+  pt <- FeaturePlot(seuobj110, features = "probabilities_neg110") + ggtitle(paste(i , "glm110"))
+  print(pt)
+  # FeaturePlot(seuobj94, features = "probabilities_neg94", min.cutoff = "q1") + ggtitle(paste(i, "glm94"))
   
 }
 
