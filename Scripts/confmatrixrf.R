@@ -170,6 +170,31 @@ for(i in names(model_list)){
   assign(paste("conf_matrix", i, "rf110", sep = ""), confusionMatrix(table(predicted.classes110, day110_gene_expression_data$celltype)))
   assign(paste("conf_matrix", i, "rf94", sep = ""), confusionMatrix(table(predicted.classes94, day94_gene_expression_data$celltype)))
   
+  
+  seuobj110$probabilities_neg110 <- 1-adjusted_probability110
+  seuobj94$probabilities_neg94 <- 1-adjusted_probability94
+  
+  pt <- FeaturePlot(seuobj110, features = "probabilities_neg110") + ggtitle(paste(i , "rf110nocutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "rf110nocutoff.png"))
+  print(pt)
+  dev.off()
+  
+  
+  pt1 <- FeaturePlot(seuobj110, features = "probabilities_neg110", min.cutoff = "q1") + ggtitle(paste(i , "rf110cutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "rf110cutoff.png"))
+  print(pt1)
+  dev.off()
+  
+  pt2 <- FeaturePlot(seuobj94, features = "probabilities_neg94") + ggtitle(paste(i , "rf94nocutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "rf94nocutoff.png"))
+  print(pt2)
+  dev.off()
+  
+  pt3 <- FeaturePlot(seuobj94, features = "probabilities_neg94", min.cutoff = "q1") + ggtitle(paste(i , "rf94cutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "rf94cutoff.png"))
+  print(pt3)
+  dev.off()
+  
 }
 
 

@@ -172,12 +172,32 @@ for(i in names(model_list)){
   
   
   seuobj110$probabilities_neg110 <- 1-adjusted_probability110
-  # seuobj94$probabilities_neg94 <- 1-adjusted_probability94
+  seuobj94$probabilities_neg94 <- 1-adjusted_probability94
   
-  pt <- FeaturePlot(seuobj110, features = "probabilities_neg110") + ggtitle(paste(i , "glm110"))
-  print(pt)
-  # FeaturePlot(seuobj94, features = "probabilities_neg94", min.cutoff = "q1") + ggtitle(paste(i, "glm94"))
+  pt <- FeaturePlot(seuobj110, features = "probabilities_neg110") + ggtitle(paste(i , "glm110nocutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "glm110nocutoff.png"))
+    print(pt)
+    dev.off()
+    
+    
+  pt1 <- FeaturePlot(seuobj110, features = "probabilities_neg110", min.cutoff = "q1") + ggtitle(paste(i , "glm110cutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "glm110cutoff.png"))
+    print(pt1)
+    dev.off()
+    
+  pt2 <- FeaturePlot(seuobj94, features = "probabilities_neg94") + ggtitle(paste(i , "glm94nocutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "glm94nocutoff.png"))
+    print(pt2)
+    dev.off()
+    
+  pt3 <- FeaturePlot(seuobj94, features = "probabilities_neg94", min.cutoff = "q1") + ggtitle(paste(i , "glm94cutoff"))
+  png(paste0("/Users/kaustubhgrama/Desktop/Computer_Science/R/Data/fetal_cerebellar_scData/models/FeaturePlots/", i, "glm94cutoff.png"))
+    print(pt3)
+    dev.off()
+
   
+  
+
 }
 
 

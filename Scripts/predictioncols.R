@@ -132,11 +132,11 @@ training.data <- day115_125_gene_expression_data %>%
 
 
 
-for(i in names(models)){
+for(i in names(model_list)){
   
   
   
-  probabilities <- models[[i]] %>% predict(day110_gene_expression_data, type = "response")
+  probabilities <- model_list[[i]] %>% predict(day110_gene_expression_data, type = "response")
   undersample_odds <- sum(training.data$Main_cluster_name == i)/sum(training.data$Main_cluster_name != i)
   scoring_odds <- probabilities/(1-probabilities)
   adjusted_odds <- scoring_odds * (original_odds/undersample_odds)

@@ -466,18 +466,18 @@ summary(step.model.both)
 #     #adding r62 value from the model into rsq_df
 #     rsq_df_neurons[rsq_df_neurons$gene==gene, "rsquare"] <- r_squared
 #     
-#     # plot <- ggplot(count_df, aes(x = count, y = logodds)) +
-#     #   geom_point(stat = "identity") + geom_smooth(method = "lm") +
-#     #   ggtitle(paste0("Log odds for ", gene, "\n(Astrocytes)")) + stat_poly_eq(use_label(c("eq", "R2")))
-#     # 
-#     # 
-#     # 
-#     # png(paste0(basepath, gene, ".png"), width = 300, height = 300)
-#     # print(plot)
-#     # dev.off()
-#   }
-# }
-# 
+    plot <- ggplot(count_df, aes(x = count, y = logodds)) +
+      geom_point(stat = "identity") + geom_smooth(method = "lm") +
+      ggtitle(paste0("Log odds for ", gene, "\n(Astrocytes)")) + stat_poly_eq(use_label(c("eq", "R2")))
+
+
+
+    png(paste0(basepath, gene, ".png"), width = 300, height = 300)
+    print(plot)
+    dev.off()
+  }
+}
+
 # rsq_df_neurons <- rsq_df_neurons[order(-rsq_df_neurons$rsquare),]
 # 
 # topgenes_logodds_neurons <- c()
