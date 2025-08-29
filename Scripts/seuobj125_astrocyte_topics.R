@@ -14,33 +14,55 @@ for(day in days){
   
   topic_cols <- grep(topiccolname, names(df), value = TRUE)
   
-  # Create the three new columns
-  code <- paste0(
-  "df$highest_topic", day, " <- apply(df[topic_cols], 1, function(x) {
-    names(sort(x, decreasing = TRUE))[1]
+  
+  df[[paste0("highest_topic", day)]]  <- apply(df[topic_cols], 1, function(x) {
+    names(sort(x, decreasing = TRUE))[1];
+    
   })
+  df[,paste0('highest_topic',"", day)]<- gsub(paste0("Day",day,'_Topic_'),'', df[,paste0('highest_topic',day)])
   
-  df$second_highest_topic", day, "  <- apply(df[topic_cols], 1, function(x) {
-    names(sort(x, decreasing = TRUE))[2]
+  df[[paste0("second_highest_topic", day)]]  <- apply(df[topic_cols], 1, function(x) {
+    names(sort(x, decreasing = TRUE))[1];
+    
   })
+  df[,paste0('second_highest_topic',"", day)]<- gsub(paste0("Day",day,'_Topic_'),'', df[,paste0('second_highest_topic',day)])
   
-  df$third_highest_topic", day, "  <- apply(df[topic_cols], 1, function(x) {
-    names(sort(x, decreasing = TRUE))[3]
-  })"
-  )
+  df[[paste0("third_highest_topic", day)]]  <- apply(df[topic_cols], 1, function(x) {
+    names(sort(x, decreasing = TRUE))[1];
+    
+  })
+  df[,paste0('third_highest_topic',"", day)]<- gsub(paste0("Day",day,'_Topic_'),'', df[,paste0('third_highest_topic',day)])
   
-  eval(parse(text = code))
-  
+  # # Create the three new columns
+  # code <- paste0(
+  # "df$highest_topic", as.integer(day), " <- apply(df[topic_cols], 1, function(x) {
+  #   names(sort(x, decreasing = TRUE))[1];
+  #   df[,paste0('highest_topic',", day,")]<- gsub(paste0(",day," ,'_Topic_'),'', df[,paste0('highest_topic', ",day,"')])
+  # })
+  # 
+  # df$second_highest_topic", day, "  <- apply(df[topic_cols], 1, function(x) {
+  #   names(sort(x, decreasing = TRUE))[2];
+  #   df[,paste0('second_highest_topic',", day,")]<- gsub(paste0(",day," ,'_Topic_'),'', df[,paste0('second_highest_topic', ",day,"')])
+  # })
+  # 
+  # df$third_highest_topic", day, "  <- apply(df[topic_cols], 1, function(x) {
+  #   names(sort(x, decreasing = TRUE))[3]
+  #   df[,paste0('third_highest_topic',", day,")]<- gsub(paste0(",day," ,'_Topic_'),'', df[,paste0('third_highest_topic', ",day,"')])
+  # })"
+  # )
+  # 
+  # eval(parse(text = code))
+
   code2 <- paste0(
-  "seuobj125_astrocyte@meta.data$highest_topic", day, "  <- df$highest_topic", day, " 
-  seuobj125_astrocyte@meta.data$second_highest_topic", day, "  <- df$second_highest_topic", day, " 
+  "seuobj125_astrocyte@meta.data$highest_topic", day, "  <- df$highest_topic", day, "
+  seuobj125_astrocyte@meta.data$second_highest_topic", day, "  <- df$second_highest_topic", day, "
   seuobj125_astrocyte@meta.data$third_highest_topic", day, "  <- df$third_highest_topic", day
   )
-  
+
   eval(parse(text = code2))
-  
-  
-  
+
+
+
   
   
   
@@ -62,7 +84,7 @@ for(day in days){
 
 
 
-pdf("/Users/kaustubhgrama/Downloads/SCRI/seuobj125_astrocyte_topic_UMAPs/seuobj125_astrocyte_topic_UMAPs.pdf")
+pdf("/Users/kaustubhgrama/Downloads/SCRI/seuobj125_astrocyte_topic_UMAPs/seuobj125_astrocyte_topic_abbreviated_UMAPs.pdf")
 
 for(day in days){
   code3 <- paste0(
@@ -94,14 +116,6 @@ for(day in days){
   
   eval(parse(text = code3))
   
- 
-  
-  
-  # basepath <- '/Users/kaustubhgrama/Downloads/SCRI/seuobj125_astrocyte_topic_UMAPs/'
-  # 
-  # saveRDS(p1, file = paste0(basepath, 'highest_topic', day, ".png"))
-  # saveRDS(p2, file = paste0(basepath, 'second_highest_topic', day, ".png"))
-  # saveRDS(p3, file = paste0(basepath, 'third_highest_topic', day, ".png"))
   
   print(p1)
   print(p2)
@@ -113,8 +127,9 @@ dev.off()
 
 
 
+metadata <- seuobj125_astrocyte@meta.data[,grep("highest", colnames(seuobj125_astrocyte@meta.data))]
 
-
+write.table(metadata, file = "/Users/kaustubhgrama/Downloads/SCRI/seuobj125_astrocyte_topic_UMAPs/metadata.txt", sep = "\t")
 
 
 
